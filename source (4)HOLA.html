@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+            <style>.lw { font-size: 60px; }</style>
+        </head>
+        <body>
+            <!--
+Single-file modern tech blog (HTML + CSS + JS).
+Features:
+- SPA with hash-based routing for subpages: Home, Portátiles, Móviles, Gadgets
+- Black & electric-blue aesthetic with reflections, glass effect and subtle animations
+- Responsive layout and accessible navigation
+- Sample content cards for each category that can be duplicated
+- Smooth transitions, floating reflections, and micro-interactions using JS + CSS
+
+Save this file as `index.html` and open it in a modern browser.
+-->
+
+
+
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TechPick — Recomendaciones de Portátiles, Móviles y Gadgets</title>
+  <meta name="description" content="Blog de recomendaciones y análisis de portátiles, móviles y gadgets. Estética moderna, negra y azul con animaciones.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle fill='%2300a3ff' cx='50' cy='50' r='40'/%3E%3C/svg%3E">
+
+  <style>
+    :root{
+      --bg:#08090b;            /* very dark */
+      --panel:#0f1720;         /* panel dark */
+      --accent:#00a3ff;        /* electric blue */
+      --accent-2:#4fb3ff;
+      --glass: rgba(255,255,255,0.04);
+      --muted:#9aa6b2;
+      --card:#0b1116;
+      --radius:14px;
+      --glass-border: rgba(255,255,255,0.04);
+      --glass-reflect: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      --transition: 300ms cubic-bezier(.2,.9,.2,1);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(0,163,255,0.06), transparent),
+                  radial-gradient(800px 400px at 90% 90%, rgba(79,179,255,0.03), transparent),
+                  var(--bg);
+      color:#e6f2ff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-y:auto;
+      line-height:1.45;
+      padding-bottom:60px;
+    }
+
+    /* App container */
+    .app{
+      max-width:1200px;
+      margin:36px auto;
+      padding:28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(0,0,0,0.02));
+      border-radius:20px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.02);
+    }
+
+    /* floating blue glow */
+    .app::before{
+      content:"";
+      position:absolute;right:-10%;top:-20%;width:700px;height:700px;
+      background:radial-gradient(circle at 30% 30%, rgba(0,163,255,0.12), transparent 20%),
+                 radial-gradient(circle at 70% 70%, rgba(79,179,255,0.06), transparent 30%);
+      filter: blur(30px);
+      transform:translateZ(0);
+      pointer-events:none;
+    }
+
+    header{
+      display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid;place-items:center;color:#00131a;font-weight:700;font-size:20px;box-shadow:0 6px 18px rgba(0,163,255,0.12);
+    }
+    .brand h1{font-size:20px;margin:0}
+    .brand p{margin:0;font-size:12px;color:var(--muted)}
+
+    nav{
+      display:flex;gap:10px;align-items:center;
+    }
+    .nav-link{
+      color:var(--muted);padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:600; font-size:14px;
+      transition:var(--transition);
+    }
+    .nav-link:hover{color:var(--accent);transform:translateY(-3px)}
+    .nav-link.active{background:linear-gradient(90deg, rgba(0,163,255,0.08), rgba(79,179,255,0.03));color:var(--accent);box-shadow:0 6px 20px rgba(0,163,255,0.06)}
+
+    /* Search */
+    .search{
+      display:flex;align-items:center;gap:8px;background:var(--glass);padding:8px;border-radius:12px;border:1px solid var(--glass-border);
+    }
+    .search input{background:transparent;border:0;color:inherit;outline:none;width:220px}
+
+    /* Layout */
+    .grid{
+      display:grid;grid-template-columns: 1fr 360px;gap:22px;align-items:start;
+    }
+
+    /* Main column */
+    main{background:transparent}
+    .hero{
+      display:flex;gap:18px;align-items:center;padding:22px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border:1px solid rgba(255,255,255,0.02);margin-bottom:18px;overflow:hidden;position:relative
+    }
+    .hero .text{flex:1}
+    .hero h2{margin:0 0 8px 0;font-size:22px}
+    .hero p{margin:0;color:var(--muted)}
+    .cta{display:inline-block;margin-top:12px;padding:8px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#00131a;font-weight:700;text-decoration:none;box-shadow:0 6px 24px rgba(0,163,255,0.14)}
+
+    /* reflective device mock */
+    .device{
+      width:220px;height:140px;border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#061018 0%, #08121a 100%);box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      position:relative;border:1px solid rgba(255,255,255,0.03)
+    }
+    .device::after{
+      content:"";position:absolute;left:0;top:0;right:0;bottom:0;background:linear-gradient(120deg,rgba(255,255,255,0.06),transparent 30%);
+      mix-blend-mode:overlay;pointer-events:none;transform:translateY(-30%);filter:blur(14px);opacity:0.7
+    }
+
+    /* Cards */
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006));
+      padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02);transition:var(--transition);position:relative;overflow:hidden
+    }
+    .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,163,255,0.06)}
+    .card .thumb{height:140px;border-radius:10px;background:linear-gradient(90deg, rgba(0,163,255,0.06), rgba(79,179,255,0.03));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--muted);margin-bottom:12px}
+    .card h3{margin:0 0 8px 0;font-size:16px}
+    .card p{margin:0;color:var(--muted);font-size:13px}
+    .tag{display:inline-block;padding:6px 8px;border-radius:8px;background:rgba(0,163,255,0.06);color:var(--accent);font-weight:700;font-size:12px;margin-top:10px}
+
+    /* Sidebar */
+    aside{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+    .aside-section{margin-bottom:12px}
+    .small-card{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;background:var(--card);border:1px solid rgba(255,255,255,0.02)}
+    .small-card img{width:56px;height:40px;object-fit:cover;border-radius:8px}
+
+    /* Footer */
+    footer{margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.02);color:var(--muted);font-size:13px;text-align:center}
+
+    /* Page transitions */
+    .page{opacity:0;transform:translateY(8px);transition:opacity 260ms ease, transform 260ms ease}
+    .page.show{opacity:1;transform:none}
+
+    /* Responsive */
+    @media (max-width:960px){
+      .grid{grid-template-columns:1fr}
+      .device{display:none}
+      .search input{width:120px}
+    }
+
+    @media (max-width:520px){
+      .brand h1{font-size:16px}
+      .logo{width:44px;height:44px}
+      .nav-link{display:none}
+    }
+
+    /* subtle floating animation for background elements */
+    .floaty{animation:floaty 8s ease-in-out infinite}
+    @keyframes floaty{0%{transform:translateY(0)}50%{transform:translateY(-10px)}100%{transform:translateY(0)}}
+
+    /* REFLECTION effect on images */
+    .reflect{position:relative}
+    .reflect::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:40%;background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));transform:skewY(-6deg);filter:blur(6px);opacity:0.35}
+
+    /* micro interactions */
+    .btn{display:inline-block;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--accent);font-weight:700;text-decoration:none}
+    .btn:active{transform:translateY(1px)}
+
+    /* cool divider */
+    .divider{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);margin:12px 0}
+  </style>
+
+
+  <div class="app" role="application" aria-label="TechPick blog" style="transition: transform 400ms ease 0s;">
+    <header>
+      <div class="brand">
+        <div class="logo">TP</div>
+        <div>
+          <h1>TechPick</h1>
+          <p>Recomendaciones de portátiles, móviles y gadgets</p>
+        </div>
+      </div>
+
+      <nav aria-label="main navigation">
+        <a class="nav-link active" href="#/" data-link="">Inicio</a>
+        <a class="nav-link" href="#/portatiles" data-link="">Portátiles</a>
+        <a class="nav-link" href="#/moviles" data-link="">Móviles</a>
+        <a class="nav-link" href="#/gadgets" data-link="">Gadgets</a>
+      </nav>
+
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="search" role="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden=""><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <input id="q" placeholder="Buscar..." aria-label="Buscar posts">
+        </div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <!-- Home page -->
+        <section id="page-home" class="page show">
+          <div class="hero">
+            <div class="text">
+              <h2>Las mejores recomendaciones tecnológicas en un solo lugar</h2>
+              <p>Guías, comparativas y análisis honestos para ayudarte a elegir portátiles, móviles y los gadgets más útiles.</p>
+              <a href="#/portatiles" class="cta">Ver últimas recomendaciones</a>
+            </div>
+            <div class="device floaty" aria-hidden="">
+              <!-- simple mock device with reflection -->
+            </div>
+          </div>
+
+          <h3 style="margin:0 0 12px 0">Últimos artículos</h3>
+          <div class="cards" id="cards-list">
+            <!-- sample cards (JS will inject more or filter) -->
+
+            <article class="card" data-category="portatiles">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">Portátil X Pro</div>
+              <h3>Portátil X Pro — Balance perfecto entre rendimiento y batería</h3>
+              <p>Procesador moderno, gran autonomía y una pantalla vibrante. Ideal para creadores y estudiantes.</p>
+              <div class="tag">Portátiles</div>
+            </article>
+
+            <article class="card" data-category="moviles">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">Móvil Z</div>
+              <h3>Móvil Z — Cámara excepcional a buen precio</h3>
+              <p>Gran rendimiento fotográfico y una experiencia fluida. Perfecto para fotografía móvil.</p>
+              <div class="tag">Móviles</div>
+            </article>
+
+            <article class="card" data-category="gadgets">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">Gadget A</div>
+              <h3>Gadget A — Accesorio compacto para productividad</h3>
+              <p>Pequeño, útil y sorprendentemente potente. Un must en tu mochila.</p>
+              <div class="tag">Gadgets</div>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- Portátiles page -->
+        <section id="page-portatiles" class="page" hidden="">
+          <h2>Portátiles</h2>
+          <p style="color:var(--muted)">Análisis y comparativas de los mejores portátiles del mercado.</p>
+          <div class="divider"></div>
+
+          <div class="cards" id="portatiles-list">
+            <!-- Example detailed card -->
+            <article class="card">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">X Pro 14"</div>
+              <h3>X Pro 14 — Recomendado para creadores</h3>
+              <p>CPU: 12-core · GPU: integrada dedicada · Batería: 12h</p>
+              <p style="margin-top:8px;color:var(--muted)">Pros: Pantalla, rendimiento. Contras: Precio algo elevado.</p>
+              <a class="btn" href="#/portatiles/xpro" data-link="">Leer reseña</a>
+            </article>
+
+            <article class="card">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">UltraBook 13</div>
+              <h3>UltraBook 13 — Ligero y elegante</h3>
+              <p>Compacto, excelente construcción y teclado cómodo.</p>
+              <div style="margin-top:10px"><span class="tag">Ligero</span></div>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- Móviles page -->
+        <section id="page-moviles" class="page" hidden="">
+          <h2>Móviles</h2>
+          <p style="color:var(--muted)">Guías, análisis de cámara y comparativas precio/rendimiento.</p>
+          <div class="divider"></div>
+
+          <div class="cards" id="moviles-list">
+            <article class="card">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">Móvil Z</div>
+              <h3>Móvil Z — Mejor cámara relación calidad/precio</h3>
+              <p>Gran sensor, modo nocturno y carga rápida.</p>
+              <a class="btn" href="#/moviles/movil-z" data-link="">Leer reseña</a>
+            </article>
+
+            <article class="card">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">EconoPhone 6</div>
+              <h3>EconoPhone 6 — Rendimiento para el día a día</h3>
+              <p>Perfecto si buscas algo funcional y económico.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Gadgets page -->
+        <section id="page-gadgets" class="page" hidden="">
+          <h2>Gadgets</h2>
+          <p style="color:var(--muted)">Los accesorios que realmente merecen la pena.</p>
+          <div class="divider"></div>
+
+          <div class="cards" id="gadgets-list">
+            <article class="card">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">Auriculares B</div>
+              <h3>Auriculares B — Cancelación de ruido eficaz</h3>
+              <p>Excelente sonido y gran comodidad para jornadas largas.</p>
+            </article>
+            <article class="card">
+              <div class="thumb reflect" style="display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); box-shadow: rgba(0, 0, 0, 0.6) 0px -24px 40px inset, rgba(0, 163, 255, 0.02) 0px 8px 30px;">PowerBank Pro</div>
+              <h3>PowerBank Pro — Carga rápida y diseño compacto</h3>
+              <p>Capaz de cargar portátiles pequeños y móviles varias veces.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- Single item template (hidden) -->
+        <section id="page-item" class="page" hidden="">
+          <a class="btn" href="#/">← Volver</a>
+          <h2 id="item-title">Título del producto</h2>
+          <p id="item-desc" style="color:var(--muted)">Descripción breve del producto.</p>
+          <div style="height:16px"></div>
+          <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start">
+            <div>
+              <div style="background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)">
+                <h3>Resumen</h3>
+                <p id="item-summary" style="color:var(--muted)">Puntos clave, pros y contras.</p>
+              </div>
+
+              <div style="height:12px"></div>
+              <div style="background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)">
+                <h3>Opinión</h3>
+                <p style="color:var(--muted)">Análisis profundo sobre por qué recomendamos (o no) este producto.</p>
+              </div>
+            </div>
+
+            <aside style="position:relative">
+              <div class="small-card">
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='100%' height='100%' fill='%230b1116'/><text x='50%' y='50%' fill='%23ffffff' font-size='28' dominant-baseline='middle' text-anchor='middle'>Imagen</text></svg>" alt="imagen">
+                <div>
+                  <div style="font-weight:700">Precio estimado</div>
+                  <div style="color:var(--muted)">Desde 799€</div>
+                </div>
+              </div>
+
+              <div style="height:12px"></div>
+              <div style="background:var(--card);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)">
+                <h4 style="margin:0 0 8px 0">Comparativa rápida</h4>
+                <p style="color:var(--muted);margin:0">Alternativas y puntos a favor en una vista compacta.</p>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+      </main>
+
+
+    <footer>
+      © 2025 TechPick.es
+    </footer>
+  </div>
+
+  <script>
+    // Simple SPA router + interactions
+    (function(){
+      const routes = ['/', '/portatiles', '/moviles', '/gadgets'];
+      const linkEls = document.querySelectorAll('[data-link]');
+      const pages = {
+        '/': document.getElementById('page-home'),
+        '/portatiles': document.getElementById('page-portatiles'),
+        '/moviles': document.getElementById('page-moviles'),
+        '/gadgets': document.getElementById('page-gadgets'),
+        '/item': document.getElementById('page-item')
+      };
+
+      function setActiveLink(path){
+        document.querySelectorAll('.nav-link').forEach(a=>{
+          a.classList.toggle('active', a.getAttribute('href') === '#'+path);
+        });
+      }
+
+      function showPage(path){
+        // Hide all
+        Object.values(pages).forEach(p=>{ if(!p) return; p.hidden = true; p.classList.remove('show'); });
+        // decide
+        const base = path.split('/').slice(0,2).join('/');
+        if(path.startsWith('/portatiles/') || path.startsWith('/moviles/') || path.startsWith('/gadgets/')){
+          // item page
+          const id = path.split('/')[2];
+          openItem(id || 'unknown');
+          pages['/item'].hidden = false; setTimeout(()=>pages['/item'].classList.add('show'),20);
+          setActiveLink('/');
+        } else {
+          const p = pages[base] || pages['/'];
+          p.hidden = false; setTimeout(()=>p.classList.add('show'),20);
+          setActiveLink(base);
+        }
+      }
+
+      function onHashChange(){
+        const hash = location.hash.replace('#','') || '/';
+        showPage(hash);
+      }
+
+      // bind links to change hash without full reload
+      linkEls.forEach(a=>{
+        a.addEventListener('click', (e)=>{
+          const href = a.getAttribute('href');
+          if(href && href.startsWith('#')){
+            // let the hashchange handler handle it
+          }
+        })
+      })
+
+      // Search functionality (simple client-side filter)
+      const q = document.getElementById('q');
+      q.addEventListener('input', (e)=>{
+        const term = e.target.value.trim().toLowerCase();
+        document.querySelectorAll('.card').forEach(card=>{
+          const text = (card.innerText || '').toLowerCase();
+          card.style.display = term ? (text.includes(term) ? '' : 'none') : '';
+        })
+      })
+
+      // Open item (fills page-item with content)
+      function openItem(id){
+        const title = document.getElementById('item-title');
+        const desc = document.getElementById('item-desc');
+        const summary = document.getElementById('item-summary');
+        // Simple mapping for demo — in a full site you'd fetch content from API or markdown
+        const repo = {
+          'xpro': {title:'X Pro 14 — Revisión completa', desc:'Portátil potente para creadores.', summary:'CPU potente, pantalla 14", 12 horas de batería. Pros: pantalla y potencia. Contras: precio.'},
+          'movil-z': {title:'Móvil Z — Cámara destacada', desc:'El Móvil Z destaca por su cámara y relación calidad/precio.', summary:'Gran sensor, estabilización óptica y vídeo nocturno sobresaliente.'},
+          'unknown': {title:'Artículo no encontrado', desc:'No tenemos datos para este artículo de ejemplo.', summary:'Este es un ejemplo de plantilla para artículos.'}
+        };
+        const data = repo[id] || repo['unknown'];
+        title.textContent = data.title; desc.textContent = data.desc; summary.textContent = data.summary;
+      }
+
+      // init
+      window.addEventListener('hashchange', onHashChange);
+      if(!location.hash) location.hash = '/';
+      onHashChange();
+
+      // small visual polish: add reflections text
+      document.querySelectorAll('.thumb').forEach((el,i)=>{
+        el.style.display='flex';el.style.alignItems='center';el.style.justifyContent='center';el.style.fontWeight='700';el.style.color='var(--muted)';
+        // add animated glow
+        el.style.boxShadow = 'inset 0 -24px 40px rgba(0,0,0,0.6), 0 8px 30px rgba(0,163,255,0.02)';
+      })
+
+      // tiny parallax on mouse move
+      const app = document.querySelector('.app');
+      app.addEventListener('mousemove', (e)=>{
+        const rect = app.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        app.style.transform = `translate3d(${x*6}px, ${y*4}px, 0)`;
+        app.style.transition = 'transform 120ms linear';
+      })
+      app.addEventListener('mouseleave', ()=>{ app.style.transform = ''; app.style.transition='transform 400ms ease'; });
+
+      // accessibility: keyboard navigation between pages (left/right)
+      window.addEventListener('keydown', (e)=>{
+        if(e.key === 'ArrowLeft' || e.key === 'ArrowRight'){
+          const idx = routes.indexOf((location.hash.replace('#','')||'/'));
+          if(idx===-1) return;
+          const next = e.key==='ArrowRight' ? Math.min(routes.length-1, idx+1) : Math.max(0, idx-1);
+          location.hash = routes[next];
+        }
+      })
+
+    })();
+  </script>
+
+
+
+            <script>// Write JavaScript here</script>
+        
+    
+</div></body>
